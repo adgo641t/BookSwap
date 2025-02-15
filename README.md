@@ -10,3 +10,7 @@
 ## About Book Swap
 
 Book Swap is an application that you can exchange books with others
+
+- build in Laravel breeze for login and register
+- Tailwind css
+- Alpine JS
