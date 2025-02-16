@@ -21,11 +21,21 @@ Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
 
 Route::middleware('auth')->group(function () {
+   Route::get('admin', [SwapRequestController::class, 'index'])->middleware('auth')->name('admin');
     Route::post('/swap/{book}', [SwapRequestController::class, 'store'])->middleware('auth');
+    Route::get('/create', [BookController::class, 'create'])->name('create');
+    //DELETE
+    Route::post('/crear', [BookController::class, 'crear'])->name('crear');
+
+    Route::post('/delete/{book}', [BookController::class, 'destroy'])->name('delete');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
     Route::post('/swap/{book}', [SwapRequestController::class, 'store'])->middleware('auth');
+    Route::patch('/acceptSwap/{id}', [SwapRequestController::class, 'switch'])->name('acceptSwap');
+    Route::patch('NoAcceptSwap', [SwapRequestController::class, 'Noswitch'])->middleware('auth')->name('NoAcceptSwap');
 
 });
 

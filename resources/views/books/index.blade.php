@@ -24,13 +24,16 @@
                 <!-- Si no está logueado, mostrar Login y Registro -->
                 <a href="{{ route('login') }}" class="text-white hover:text-gray-300">Login</a>
                 <a href="{{ route('register') }}" class="text-white hover:text-gray-300">Registro</a>
+
             @else
                 <!-- Si está logueado, mostrar el nombre del usuario y Logout -->
                 <span class="text-white">Bienvenido, {{ Auth::user()->name }}</span>
+                <a href="{{ route('admin') }}" class="text-white hover:text-gray-300">Admin de libros</a>
                 <form action="{{ route('logout') }}" method="POST" class="inline">
                     @csrf
                     <button type="submit" class="text-white hover:text-gray-300">Logout</button>
                 </form>
+                <span class="text-white">Credito: {{ Auth::user()->credit }}</span>
             @endguest
         </div>
     </div>
@@ -69,6 +72,7 @@
                             @else
                                 <span class="text-xs text-gray-500">Este es tu libro</span>
                             @endif
+    
                         @endauth
                     </div>
                 </div>

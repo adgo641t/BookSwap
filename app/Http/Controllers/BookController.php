@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
@@ -21,7 +22,26 @@ class BookController extends Controller
      */
     public function create()
     {
-        //
+        return view('books.create');
+    }
+
+    public function crear(Request $req){
+        $req->validate([
+            'titulo' => 'required|string|max:255',
+            'autor' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'imagen' => 'nullable|image|max:2048',
+        ]);
+        $books = new Book();
+
+        $books->user_id = auth()->id();
+        $books->title = $req->titulo;
+        $books->author = $req->autor;
+        $books->description = $req->descripcion;
+        $books->image = $req->imagen;
+
+        $books->save($req->all());
+        return redirect()->route('books.index');
     }
 
     /**
@@ -36,14 +56,16 @@ class BookController extends Controller
             'image' => 'nullable|image|max:2048',
         ]);
 
-        $imagePath = $request->file('image') ? $request->file('image')->store('books', 'public') : null;
-
-        auth()->user()->books()->create([
-            'title' => $request->title,
-            'author' => $request->author,
-            'description' => $request->description,
-            'image' => $imagePath,
-        ]);
+        $book = new Book();
+        $book->title = $request->title;
+        $book->author = $request->author;
+        $book->user_id = auth()->id();
+        $book->save();
+    
+        // Dar 1 crédito al usuario
+        $user = auth()->user();
+        $user->credits += 1;
+        $user->save();
 
         return redirect()->back()->with('success', 'Libro agregado con éxito.');
     }
@@ -61,7 +83,9 @@ class BookController extends Controller
      */
     public function edit(Book $book)
     {
-        //
+        $this->authorize('update', $book);
+
+
     }
 
     /**
@@ -77,6 +101,7 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
-        //
+        $book->delete();
+        return redirect()->back()->with('success', 'Libro eliminado con éxito.');
     }
 }

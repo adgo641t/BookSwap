@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\SwapRequest;
 use Illuminate\Http\Request;
 use App\Models\Book;
+use App\Models\User;
+
 
 class SwapRequestController extends Controller
 {
@@ -13,7 +15,23 @@ class SwapRequestController extends Controller
      */
     public function index()
     {
-        //
+        $user = User::all();
+        $books = Book::all();
+        $requestBook =  SwapRequest::where('from_user_id', auth()->id())->latest()->get();
+        $allBoksUser = Book::where('user_id', auth()->id())->get();
+        return view('books.adminBooks', compact('requestBook','user','books','allBoksUser'));
+    }
+
+    public function switch($id) {
+        // Encuentra el libro por ID
+        $book = SwapRequest::findOrFail($id);
+
+        // Actualiza el estado del libro (por ejemplo, "Aceptado")
+        $book->status = 'accepted';
+        $book->save();
+
+        // Opcionalmente, puedes redirigir a la lista de libros con un mensaje
+        return redirect()->route('books.index')->with('success', 'Cambio de libro aceptado exitosamente.');
     }
 
     /**
@@ -21,7 +39,7 @@ class SwapRequestController extends Controller
      */
     public function create()
     {
-        //
+       
     }
 
     /**
@@ -29,9 +47,6 @@ class SwapRequestController extends Controller
      */
     public function store(Request $request, Book $book)
     {
-        if ($book->user_id === auth()->id()) {
-            return redirect()->back()->with('error', 'No puedes intercambiar tu propio libro.');
-        }
 
         SwapRequest::create([
             'from_user_id' => auth()->id(),
